@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume Requirements Form</title>
+<style>
+  :root{--ink:#111;--muted:#666;--line:#e5e5e5;--bg:#f4f4f4;--card:#fff;--err:#c00}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  header{background:#000;color:#fff;padding:42px 20px 76px;text-align:center}
+  header h1{margin:0 0 8px;font-size:28px;letter-spacing:.3px}
+  header p{margin:0 auto;max-width:580px;color:#d0d0d0}
+  main{max-width:780px;margin:-44px auto 60px;padding:0 16px}
+  .progress{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:16px}
+  .bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;background:#000;transition:width .3s}
+  .pl{font-size:13px;color:var(--muted);margin-top:8px;display:flex;justify-content:space-between}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px}
+  .step{display:none}.step.active{display:block}
+  h2{margin:0 0 4px;font-size:20px}
+  .sub{color:var(--muted);margin:0 0 22px;font-size:14px}
+  .field{margin-bottom:18px}
+  label.l{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+  .req{color:var(--err)}
+  .hint{font-size:12.5px;color:var(--muted);margin:-2px 0 6px}
+  input[type=text],input[type=email],input[type=tel],input[type=url],input[type=date],select,textarea{
+    width:100%;padding:11px 12px;border:1px solid #bdbdbd;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+  textarea{min-height:92px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:2px solid #000;outline-offset:1px;border-color:#000}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}.card{padding:18px}}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opts label{display:flex;align-items:center;gap:8px;border:1px solid #bdbdbd;border-radius:99px;padding:8px 14px;font-size:14px;cursor:pointer;background:#fff;user-select:none}
+  .opts label:has(input:checked){background:#000;border-color:#000;color:#fff;font-weight:600}
+  .opts input{accent-color:#000}
+  .invalid input,.invalid select,.invalid textarea{border-color:var(--err)}
+  .invalid .opts label{border-color:var(--err)}
+  .errmsg{display:none;color:var(--err);font-size:12.5px;margin-top:5px}
+  .invalid .errmsg{display:block}
+  .entry{border:1px solid var(--line);background:#fafafa;border-radius:12px;padding:16px;margin-bottom:14px;position:relative}
+  .entry h3{margin:0 0 12px;font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+  .entry .rm{background:none;color:var(--err);padding:2px 6px;font-size:13px;font-weight:600}
+  .add{background:#fff;border:1.5px dashed #000;color:#000;width:100%;margin-bottom:6px}
+  .add:hover{background:#000;color:#fff}
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+  button{font:inherit;border:0;border-radius:8px;padding:12px 22px;cursor:pointer;font-weight:600}
+  .primary{background:#000;color:#fff}.primary:hover{background:#333}
+  .ghost{background:#fff;border:1px solid #000;color:#000}.ghost:hover{background:#f0f0f0}
+  button:disabled{opacity:.6;cursor:wait}
+  .hp{position:absolute;left:-9999px;opacity:0}
+  .done{text-align:center;padding:30px 10px}
+  .done .tick{width:64px;height:64px;border-radius:50%;background:#000;color:#fff;font-size:32px;display:grid;place-items:center;margin:0 auto 14px}
+  .fail{background:#fff;border:1.5px solid #000;border-radius:10px;padding:14px;margin-top:16px;font-size:14px;display:none}
+  .fail textarea{margin-top:8px;min-height:120px;font-size:12px}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Resume Requirements Form</h1>
+  <p id="intro">Share your details so we can build a resume that gets you noticed. Fill in as much as you can — anything you're unsure about, you can skip or write "not sure". It takes about 10 minutes.</p>
+</header>
+
+<main>
+  <div class="progress" id="progress">
+    <div class="bar"><i id="barfill"></i></div>
+    <div class="pl"><span id="plabel"></span><span id="ppct"></span></div>
+  </div>
+
+  <form class="card" id="form" novalidate>
+    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <!-- 1 PERSONAL -->
+    <section class="step" data-title="Personal details">
+      <h2>1. Personal details</h2>
+      <p class="sub">This goes at the top of your resume.</p>
+      <div class="grid">
+        <div class="field"><label class="l">Full name <span class="req">*</span></label>
+          <input type="text" name="Full name" required><div class="errmsg">Please enter your name.</div></div>
+        <div class="field"><label class="l">Email <span class="req">*</span></label>
+          <input type="email" name="Email" required><div class="errmsg">Please enter a valid email.</div></div>
+        <div class="field"><label class="l">Phone / WhatsApp <span class="req">*</span></label>
+          <input type="tel" name="Phone / WhatsApp" required><div class="errmsg">Please enter a phone number.</div></div>
+        <div class="field"><label class="l">City, State / Country <span class="req">*</span></label>
+          <input type="text" name="Location" required placeholder="Chennai, India"><div class="errmsg">Please enter your location.</div></div>
+        <div class="field"><label class="l">LinkedIn URL</label>
+          <input type="text" name="LinkedIn" placeholder="linkedin.com/in/…"></div>
+        <div class="field"><label class="l">Portfolio / website</label>
+          <input type="text" name="Portfolio / website"></div>
+        <div class="field"><label class="l">GitHub / Behance / Dribbble</label>
+          <input type="text" name="GitHub / Behance / Dribbble"></div>
+        <div class="field"><label class="l">Other links</label>
+          <input type="text" name="Other links" placeholder="Blog, YouTube, Kaggle…"></div>
+        <div class="field"><label class="l">Date of birth <span class="hint" style="display:inline">(only if you want it shown)</span></label>
+          <input type="date" name="Date of birth"></div>
+        <div class="field"><label class="l">Include these on the resume?</label>
+          <div class="opts">
+            <label><input type="checkbox" name="Show on resume" value="Photo"> Photo</label>
+            <label><input type="checkbox" name="Show on resume" value="Date of birth"> DOB</label>
+            <label><input type="checkbox" name="Show on resume" value="Full address"> Full address</label>
+            <label><input type="checkbox" name="Show on resume" value="Marital status / nationality"> Nationality</label>
+          </div></div>
+      </div>
+    </section>
+
+    <!-- 2 TARGET -->
+    <section class="step" data-title="Target & resume type">
+      <h2>2. Your target job & resume type</h2>
+      <p class="sub">The resume is written around the job you want.</p>
+      <div class="field"><label class="l">Target job title(s) <span class="req">*</span></label>
+        <input type="text" name="Target job title(s)" required placeholder="e.g. Full Stack Developer, UI/UX Designer"><div class="errmsg">Please tell us the role you're targeting.</div></div>
+      <div class="grid">
+        <div class="field" data-group="req"><label class="l">Experience level <span class="req">*</span></label>
+          <select name="Experience level" required>
+            <option value="">Select…</option><option>Student / Fresher</option><option>0–1 years</option><option>1–3 years</option>
+            <option>3–5 years</option><option>5–10 years</option><option>10+ years</option><option>Career break returning</option><option>Career change</option>
+          </select><div class="errmsg">Please select.</div></div>
+        <div class="field"><label class="l">Industry / domain</label>
+          <input type="text" name="Industry / domain" placeholder="IT, Finance, Marketing, Healthcare…"></div>
+        <div class="field"><label class="l">Preferred job location</label>
+          <input type="text" name="Preferred job location" placeholder="Chennai, Remote, Abroad…"></div>
+        <div class="field"><label class="l">Target companies (if any)</label>
+          <input type="text" name="Target companies"></div>
+      </div>
+      <div class="field"><label class="l">Job description / posting link</label>
+        <div class="hint">If you're applying to a specific job, paste the link or text so we can tailor the keywords.</div>
+        <textarea name="Job description / link"></textarea></div>
+      <div class="field"><label class="l">Type of resume</label>
+        <div class="opts">
+          <label><input type="checkbox" name="Resume type" value="ATS-friendly"> ATS-friendly</label>
+          <label><input type="checkbox" name="Resume type" value="One page"> One page</label>
+          <label><input type="checkbox" name="Resume type" value="Two pages"> Two pages</label>
+          <label><input type="checkbox" name="Resume type" value="Creative / designer"> Creative / designer</label>
+          <label><input type="checkbox" name="Resume type" value="Academic CV"> Academic CV</label>
+          <label><input type="checkbox" name="Resume type" value="Cover letter"> + Cover letter</label>
+          <label><input type="checkbox" name="Resume type" value="LinkedIn profile makeover"> + LinkedIn makeover</label>
+        </div></div>
+      <div class="field"><label class="l">Existing resume</label>
+        <div class="hint">Link to your current resume (Google Drive / Dropbox, access open) — or write "none".</div>
+        <input type="text" name="Existing resume link"></div>
+    </section>
+
+    <!-- 3 SUMMARY & SKILLS -->
+    <section class="step" data-title="Summary & skills">
+      <h2>3. Summary & skills</h2>
+      <p class="sub">The first thing a recruiter reads.</p>
+      <div class="field"><label class="l">Tell us about yourself</label>
+        <div class="hint">Who you are, what you do best, and what you want next. Rough notes are fine.</div>
+        <textarea name="About / professional summary"></textarea></div>
+      <div class="field"><label class="l">Career goal</label>
+        <textarea name="Career goal"></textarea></div>
+      <div class="field"><label class="l">Technical / hard skills <span class="req">*</span></label>
+        <div class="hint">Group them if you can (e.g. Frontend: React, Tailwind · Backend: Node.js · Database: MongoDB)</div>
+        <textarea name="Technical skills" required></textarea><div class="errmsg">Please list your key skills.</div></div>
+      <div class="field"><label class="l">Tools & software</label>
+        <input type="text" name="Tools & software" placeholder="Figma, Git, MS Office, AWS…"></div>
+      <div class="field"><label class="l">Soft skills</label>
+        <input type="text" name="Soft skills" placeholder="Leadership, Communication, Teamwork…"></div>
+      <div class="grid">
+        <div class="field"><label class="l">Languages known</label>
+          <input type="text" name="Languages" placeholder="Tamil (native), English (fluent)"></div>
+        <div class="field"><label class="l">Hobbies / interests</label>
+          <input type="text" name="Hobbies / interests"></div>
+      </div>
+    </section>
+
+    <!-- 4 EXPERIENCE -->
+    <section class="step" data-title="Work experience">
+      <h2>4. Work experience</h2>
+      <p class="sub">Include jobs, internships, freelance work, and founder roles. Latest first. Skip if you're a fresher with none.</p>
+      <div class="repeat" id="r-exp"></div>
+      <button type="button" class="add" data-add="exp">+ Add another experience</button>
+    </section>
+
+    <!-- 5 EDUCATION -->
+    <section class="step" data-title="Education & certifications">
+      <h2>5. Education & certifications</h2>
+      <p class="sub">Add highest qualification first, then others (12th, 10th if needed).</p>
+      <div class="repeat" id="r-edu"></div>
+      <button type="button" class="add" data-add="edu">+ Add education</button>
+      <h2 style="margin-top:28px">Certifications, courses & training</h2>
+      <p class="sub">Internships, online courses, workshops, badges.</p>
+      <div class="repeat" id="r-cert"></div>
+      <button type="button" class="add" data-add="cert">+ Add certification / course</button>
+    </section>
+
+    <!-- 6 PROJECTS & ACHIEVEMENTS -->
+    <section class="step" data-title="Projects & achievements">
+      <h2>6. Projects</h2>
+      <p class="sub">Academic, personal, freelance or client projects.</p>
+      <div class="repeat" id="r-proj"></div>
+      <button type="button" class="add" data-add="proj">+ Add another project</button>
+      <h2 style="margin-top:28px">Achievements & activities</h2>
+      <div class="field"><label class="l">Awards, achievements & recognitions</label>
+        <textarea name="Achievements"></textarea></div>
+      <div class="field"><label class="l">Leadership roles, clubs, mentoring</label>
+        <textarea name="Leadership / clubs"></textarea></div>
+      <div class="field"><label class="l">Volunteering, publications, patents, speaking</label>
+        <textarea name="Volunteering / publications"></textarea></div>
+      <div class="field"><label class="l">References</label>
+        <select name="References"><option value="">Select…</option><option>Include references</option><option>"Available on request"</option><option>Don't include</option></select></div>
+    </section>
+
+    <!-- 7 DESIGN & DELIVERY -->
+    <section class="step" data-title="Design & delivery">
+      <h2>7. Design & delivery</h2>
+      <p class="sub">Last step — how you want it to look and when you need it.</p>
+      <div class="field"><label class="l">Design style</label>
+        <div class="opts">
+          <label><input type="checkbox" name="Design style" value="Minimal & clean"> Minimal & clean</label>
+          <label><input type="checkbox" name="Design style" value="Modern"> Modern</label>
+          <label><input type="checkbox" name="Design style" value="Classic / traditional"> Classic</label>
+          <label><input type="checkbox" name="Design style" value="Creative"> Creative</label>
+          <label><input type="checkbox" name="Design style" value="Black & white"> Black & white</label>
+          <label><input type="checkbox" name="Design style" value="Colourful"> Colourful</label>
+        </div></div>
+      <div class="grid">
+        <div class="field"><label class="l">Preferred colour(s)</label>
+          <input type="text" name="Preferred colours"></div>
+        <div class="field"><label class="l">Preferred font style</label>
+          <select name="Font style"><option value="">No preference</option><option>Serif (formal)</option><option>Sans-serif (modern)</option><option>Mixed</option></select></div>
+        <div class="field"><label class="l">Delivery format</label>
+          <div class="opts">
+            <label><input type="checkbox" name="Delivery format" value="PDF"> PDF</label>
+            <label><input type="checkbox" name="Delivery format" value="Word (.docx)"> Word</label>
+            <label><input type="checkbox" name="Delivery format" value="Google Doc"> Google Doc</label>
+            <label><input type="checkbox" name="Delivery format" value="Canva / Figma"> Canva/Figma</label>
+          </div></div>
+        <div class="field"><label class="l">Number of versions</label>
+          <select name="Number of versions"><option value="">Select…</option><option>1 resume</option><option>2 (different roles)</option><option>3 or more</option></select></div>
+        <div class="field"><label class="l">Needed by</label>
+          <input type="date" name="Deadline"></div>
+        <div class="field"><label class="l">Urgency</label>
+          <select name="Urgency"><option value="">Select…</option><option>Normal</option><option>Urgent (24–48 hrs)</option><option>Flexible</option></select></div>
+      </div>
+      <div class="field"><label class="l">Sample resumes you like</label>
+        <input type="text" name="Reference resume links" placeholder="Links or notes"></div>
+      <div class="field"><label class="l">Anything else we should know?</label>
+        <textarea name="Additional notes"></textarea></div>
+      <div class="field"><label class="l">Preferred way to contact you</label>
+        <div class="opts">
+          <label><input type="checkbox" name="Preferred contact" value="Email"> Email</label>
+          <label><input type="checkbox" name="Preferred contact" value="WhatsApp"> WhatsApp</label>
+          <label><input type="checkbox" name="Preferred contact" value="Phone call"> Phone call</label>
+        </div></div>
+      <div class="field" data-group="req"><div class="opts"><label><input type="checkbox" id="consent"> I confirm the details are correct and I agree to be contacted about my resume. <span class="req">*</span></label></div>
+        <div class="errmsg">Please tick to confirm.</div></div>
+    </section>
+
+    <div class="fail" id="fail">
+      <strong>We couldn't send automatically.</strong> Please copy the details below and email them to <span id="failTo"></span>.
+      <textarea id="failText" readonly></textarea>
+      <button type="button" class="ghost" id="copyBtn" style="margin-top:8px">Copy details</button>
+    </div>
+
+    <div class="nav">
+      <button type="button" class="ghost" id="back">← Back</button>
+      <button type="button" class="primary" id="next">Next →</button>
+    </div>
+
+    <div class="done" id="done" style="display:none">
+      <div class="tick">✓</div>
+      <h2>Thank you!</h2>
+      <p class="sub">Your resume details have been sent. We'll review them and get back to you shortly.</p>
+    </div>
+  </form>
+  <footer id="foot"></footer>
+</main>
+
+<script>
+/* ============ CONFIG ============ */
+const CONFIG = {
+  ownerEmail: "qyrixx26@gmail.com",   // all submissions are emailed here
+  businessName: "Qyrixx"
+};
+/* ================================== */
+
+document.getElementById("foot").textContent = "© " + new Date().getFullYear() + " " + CONFIG.businessName + " · Your information is used only to prepare your resume.";
+
+/* Repeatable sections */
+const REPEATS = {
+  exp:{label:"Experience", key:"Work Experience", min:1, fields:[
+    ["Company / organisation","text"],["Job title / role","text"],["Location","text"],
+    ["Start (e.g. Jun 2024)","text"],["End (or Present)","text"],
+    ["Responsibilities & achievements","textarea","Use numbers where possible: users served, revenue, % improvement…"]]},
+  edu:{label:"Education", key:"Education", min:1, fields:[
+    ["Degree / course","text"],["College / school","text"],["Location","text"],
+    ["Start year","text"],["End year (or expected)","text"],["Marks / CGPA","text"]]},
+  cert:{label:"Certification / course", key:"Certification", min:1, fields:[
+    ["Course / certification name","text"],["Issued by","text"],["Year / duration","text"]]},
+  proj:{label:"Project", key:"Project", min:1, fields:[
+    ["Project name","text"],["Technologies / tools","text"],["Link (GitHub / live / Figma)","text"],
+    ["What it does & your role","textarea"]]}
+};
+const esc = s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function addEntry(k){
+  const R = REPEATS[k], box = document.getElementById("r-"+k);
+  const n = box.children.length+1;
+  const d = document.createElement("div"); d.className="entry";
+  d.innerHTML = `<h3><span>${R.label} ${n}</span>${n>1?'<button type="button" class="rm">Remove</button>':''}</h3>
+   <div class="grid">${R.fields.map(f=>{
+     const wide = f[1]==="textarea";
+     const input = wide ? `<textarea data-f="${esc(f[0])}"></textarea>` : `<input type="text" data-f="${esc(f[0])}">`;
+     return `<div class="field" style="${wide?'grid-column:1/-1':''}"><label class="l">${f[0]}</label>${f[2]?`<div class="hint">${f[2]}</div>`:''}${input}</div>`;
+   }).join("")}</div>`;
+  const rm = d.querySelector(".rm");
+  if(rm) rm.onclick = ()=>{ d.remove(); [...box.children].forEach((e,i)=>e.querySelector("h3 span").textContent=R.label+" "+(i+1)); };
+  box.appendChild(d);
+}
+Object.keys(REPEATS).forEach(k=>addEntry(k));
+document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addEntry(b.dataset.add));
+
+/* Stepper */
+const steps = [...document.querySelectorAll(".step")];
+const form = document.getElementById("form");
+let cur = 0;
+function show(i){
+  cur = i;
+  steps.forEach((s,k)=>s.classList.toggle("active",k===i));
+  const pct = Math.round((i+1)/steps.length*100);
+  document.getElementById("barfill").style.width = pct+"%";
+  document.getElementById("plabel").textContent = `Step ${i+1} of ${steps.length} — ${steps[i].dataset.title}`;
+  document.getElementById("ppct").textContent = pct+"%";
+  document.getElementById("back").style.visibility = i===0 ? "hidden":"visible";
+  document.getElementById("next").textContent = i===steps.length-1 ? "Submit details" : "Next →";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function validateStep(i){
+  let ok = true, first = null;
+  steps[i].querySelectorAll(".field").forEach(f=>{
+    let bad = false;
+    if(f.dataset.group==="req" && !f.querySelector("select")){ bad = !f.querySelector("input:checked"); }
+    else{
+      const el = f.querySelector("input[required],select[required],textarea[required]");
+      if(el){
+        bad = !el.value.trim();
+        if(!bad && el.type==="email") bad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+      }
+    }
+    f.classList.toggle("invalid",bad);
+    if(bad){ ok=false; first = first||f; }
+  });
+  if(first) first.scrollIntoView({behavior:"smooth",block:"center"});
+  return ok;
+}
+
+/* Collect data in a readable order */
+function collect(){
+  const data = {};
+  const put = (k,v)=>{ if(v!=="" && v!=null) data[k] = v; };
+  const seen = new Set();
+  steps.forEach(step=>{
+    // static fields in this step
+    step.querySelectorAll("[name]").forEach(el=>{
+      const n = el.name; if(seen.has(n)) return; seen.add(n);
+      if(el.type==="checkbox"){
+        put(n,[...form.querySelectorAll(`[name="${CSS.escape(n)}"]:checked`)].map(c=>c.value).join(", "));
+      } else put(n, el.value.trim());
+    });
+    // repeatable groups in this step
+    step.querySelectorAll(".repeat").forEach(box=>{
+      const k = box.id.replace("r-",""), R = REPEATS[k];
+      let c = 0;
+      [...box.children].forEach(entry=>{
+        const parts = [...entry.querySelectorAll("[data-f]")].map(el=>[el.dataset.f, el.value.trim()]).filter(p=>p[1]);
+        if(!parts.length) return;
+        c++; put(`${R.key} ${c}`, parts.map(p=>`${p[0]}: ${p[1]}`).join("\n"));
+      });
+    });
+  });
+  return data;
+}
+
+async function submit(){
+  const btn = document.getElementById("next");
+  const data = collect();
+  const subject = `Resume requirements — ${data["Full name"]||"New client"}${data["Target job title(s)"]?" ("+data["Target job title(s)"]+")":""}`;
+  const payload = Object.assign({}, data, {
+    _subject: subject, _template: "table", _captcha: "false",
+    _replyto: data["Email"], _honey: form.elements["_honey"].value
+  });
+  btn.disabled = true; btn.textContent = "Sending…";
+  try{
+    const r = await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(CONFIG.ownerEmail),{
+      method:"POST", headers:{"Content-Type":"application/json","Accept":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok || j.success===false || j.success==="false") throw new Error(j.message||"Send failed");
+    form.querySelectorAll(".step,.nav,.fail").forEach(e=>e.style.display="none");
+    document.getElementById("progress").style.display="none";
+    document.getElementById("done").style.display="block";
+    window.scrollTo({top:0,behavior:"smooth"});
+  }catch(e){
+    document.getElementById("failText").value = subject+"\n\n"+Object.entries(data).map(([k,v])=>k+": "+v).join("\n\n");
+    document.getElementById("failTo").textContent = CONFIG.ownerEmail;
+    document.getElementById("fail").style.display="block";
+    btn.disabled=false; btn.textContent="Try again";
+  }
+}
+
+document.getElementById("next").onclick = ()=>{
+  if(!validateStep(cur)) return;
+  if(cur<steps.length-1) show(cur+1); else submit();
+};
+document.getElementById("back").onclick = ()=>{ if(cur>0) show(cur-1); };
+document.getElementById("copyBtn").onclick = async ()=>{
+  const t = document.getElementById("failText"); t.select();
+  try{ await navigator.clipboard.writeText(t.value); }catch(e){ document.execCommand("copy"); }
+};
+form.addEventListener("input",e=>{ const f=e.target.closest(".field"); if(f) f.classList.remove("invalid"); });
+form.addEventListener("submit",e=>e.preventDefault());
+show(0);
+</script>
+</body>
+</html>
